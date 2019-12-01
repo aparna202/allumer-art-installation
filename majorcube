@@ -1,0 +1,140 @@
+#include <FastLED.h>
+#define LED_PIN     6
+#define mic A0 //analog input from mic module
+#define mic2 A1 //analog input from mic module
+#define mic3 A2 //analog input from mic module
+#define NUM_LEDS    350
+#define BRIGHTNESS  64
+#define LED_TYPE    WS2811
+#define COLOR_ORDER GRB
+CRGB leds[NUM_LEDS];
+
+#define UPDATES_PER_SECOND 100
+
+int audio = A0;
+int audio2= A1;
+int audio3= A2;
+int mic_Value; 
+int mic_Value2;
+int mic_Value3;  
+int loop_max = 0;
+int k = 255; // COLOR WHEEL POSITION
+int decay = 0; // HOW MANY MS BEFORE ONE LIGHT DECAY
+int decay_check = 0;
+long pre_react = 0; // NEW SPIKE CONVERSION
+long react = 0; // NUMBER OF LEDs BEING LIT
+long post_react = 0; // OLD SPIKE CONVERSION
+
+// RAINBOW WAVE SETTINGS
+int wheel_speed = 3;
+
+void setup()
+{
+  // LED LIGHTING SETUP
+  delay( 3000 ); // power-up safety delay
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.setBrightness(  BRIGHTNESS );
+
+  // CLEAR LEDS
+  for (int i = 0; i < NUM_LEDS; i++){
+    leds[i] = CRGB(200, 200, 200);
+    FastLED.show();}
+
+  // SERIAL AND INPUT SETUP
+  Serial.begin(115200);
+}
+CRGB Scroll(int pos) {
+  CRGB color (0,0,0);
+  if(pos < 85) {
+    color.g = 0;
+    color.r = ((float)pos / 85.0f) * 255.0f;
+    color.b = 255 - color.r;
+  } else if(pos < 170) {
+    color.g = ((float)(pos - 85) / 85.0f) * 255.0f;
+    color.r = 255 - color.g;
+    color.b = 0;
+  } else if(pos < 256) {
+    color.b = ((float)(pos - 170) / 85.0f) * 255.0f;
+    color.g = 255 - color.b;
+    color.r = 1;
+  }
+  return color;
+}
+
+void rainbow()
+{
+  for(int i = NUM_LEDS - 1; i >= 0; i--) {
+    if (i < react)
+      leds[i] = Scroll((i * 256 / 50 + k) % 256);
+    else
+      leds[i] = CRGB(0, 0, 0);      
+  }
+  FastLED.show(); 
+}
+
+void loop()
+{
+  mic_Value = analogRead(mic);//storing analog values from mic to mic_value
+  Serial.println(mic_Value);
+  if(mic_Value>30 ) //to avoid small noise
+  {
+//      while(1>0){a
+    for(int i=0;i<=100;i++)//for changing color of all 10 LEDs
+    {
+    int red=random(255); //random red color value between 0 to 255
+    int green=random(255); //random green color value between 0 to 255
+    int blue=random(255); //random blue color value between 0 to 255
+    leds[i]=CRGB(255,0,blue); //assigning color values to LEDs
+    LEDS.show();
+  }
+
+  for(int i=0;i<=100;i++)//for changing color of all 10 LEDs
+    {
+    int red=random(255); //random red color value between 0 t o 255
+    int green=random(255); //random green color value between 0 to 255
+    int blue=random(255); //random blue color value between 0 to 255
+    leds[i]=CRGB(0,255,blue); //assigning color values to LEDs
+    LEDS.show();
+  }
+   for(int i=200;i<=350;i++)//for changing color of all 10 LEDs
+    {
+    int red=random(255); //random red color value between 0 to 255
+    int green=random(255); //random green color value between 0 to 255
+    int blue=random(255); //random blue color value between 0 to 255
+    leds[i]=CRGB(0,green,255); //assigning color values to LEDs
+    LEDS.show();
+  }
+
+  for(int i=100;i<=200;i++)//for changing color of all 10 LEDs
+    {
+    int red=random(255); //random red color value between 0 to 255
+    int green=random(255); //random green color value between 0 to 255
+    int blue=random(255); //random blue color value between 0 to 255
+    leds[i]=CRGB(255,0,blue); //assigning color values to LEDs
+    LEDS.show();
+  }
+
+ 
+
+  for(int i=200;i<=350;i++)//for changing color of all 10 LEDs
+    {
+    int red=random(255); //random red color value between 0 to 255
+    int green=random(255); //random green color value between 0 to 255
+    int blue=random(255); //random blue color value between 0 to 255
+    leds[i]=CRGB(0,255,green); //assigning color values to LEDs
+    LEDS.show();
+  }
+
+  
+    for(int i=100;i<=200;i++)//for changing color of all 10 LEDs
+    {
+    int red=random(255); //random red color value between 0 to 255
+    int green=random(255); //random green color value between 0 to 255
+    int blue=random(255); //random blue color value between 0 to 255
+    leds[i]=CRGB(0,255,blue); //assigning color values to LEDs
+    LEDS.show();
+//  }
+  }
+  
+ }
+}
